@@ -345,14 +345,22 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: Image.memory(
-                      base64Decode(selectedVehicle.vehiclePhoto),
+                    child: Image.network(
+                      selectedVehicle.vehiclePhoto,
                       height: 140,
-                      width: 180, 
-                      // Added width to maintain aspect ratio
-                      fit: BoxFit
-                          .cover, // Ensures the image fits within the given space
+                      width: 180,
+                      fit: BoxFit.cover,
                     ),
+
+
+                    // child: Image.memory(
+                    //   base64Decode(selectedVehicle.vehiclePhoto),
+                    //   height: 140,
+                    //   width: 180, 
+                    //   // Added width to maintain aspect ratio
+                    //   fit: BoxFit
+                    //       .cover, // Ensures the image fits within the given space
+                    // ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(

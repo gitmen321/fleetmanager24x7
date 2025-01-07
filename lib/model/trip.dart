@@ -14,7 +14,7 @@ class Trip{
   String tripDestination;
   String? vehicleLocation;
   String tripType;
-  int tripRemunaration;
+  int? tripRemunaration;
   String? notification;
   int? odometerStart;
   int? odometerEnd;

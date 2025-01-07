@@ -289,17 +289,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 scale: scale,
                 child: Container(
                   //width: MediaQuery.of(context).size.width / 2.5,
+
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
-                      image: MemoryImage(base64Decode((loginController.vehicles
-                          .firstWhere((vehicle) =>
-                              vehicle.vehicleNumber ==
-                              loginController.trips[index].vehicleNumber)
-                          .vehiclePhoto))),
+                      image: NetworkImage(
+                        loginController.vehicles
+                            .firstWhere((vehicle) =>
+                                vehicle.vehicleNumber ==
+                                loginController.trips[index].vehicleNumber)
+                            .vehiclePhoto,
+                      ),
                       fit: BoxFit.fill, // Make the image fill the container
                     ),
                   ),
+
+                  // decoration: BoxDecoration(
+                  //   borderRadius: BorderRadius.circular(10),
+                  //   image: DecorationImage(
+                  //     image: MemoryImage(base64Decode((loginController.vehicles
+                  //         .firstWhere((vehicle) =>
+                  //             vehicle.vehicleNumber ==
+                  //             loginController.trips[index].vehicleNumber)
+                  //         .vehiclePhoto))),
+                  //     fit: BoxFit.fill, // Make the image fill the container
+                  //   ),
+                  // ),
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -565,23 +580,33 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : "Trip to Start",
                         style: const TextStyle(
                             color: greenlight, fontWeight: FontWeight.w500)),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Stack(
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(25),
-                          child: Image.memory(
-                            base64Decode(
-                                loginController.currentvehicle!.vehiclePhoto),
+                          child: Image.network(
+                            loginController.currentvehicle!.vehiclePhoto,
                             height: 140,
+                            fit: BoxFit.cover,
                           ),
                         ),
+
+                        // ClipRRect(
+                        //   borderRadius: BorderRadius.circular(25),
+                        //   child: Image.memory(
+                        //     base64Decode(
+                        //         loginController.currentvehicle!.vehiclePhoto),
+                        //     height: 140,
+                        //   ),
+                        // ),
                         Positioned(
                           bottom: 10,
                           left: 10,
                           child: Text(
-                            "${getFirstWords(loginController.currentvehicle!.vehicleName, 2)}",
-                            style: TextStyle(
+                            getFirstWords(
+                                loginController.currentvehicle!.vehicleName, 2),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
                             ),
@@ -977,14 +1002,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(25),
-                          child: Image.memory(
-                            base64Decode(
-                                loginController.currentvehicle!.vehiclePhoto),
+
+                          child: Image.network(
+                            loginController.currentvehicle!.vehiclePhoto,
                             height: 150,
-                            width: 150, // Added width to maintain aspect ratio
-                            fit: BoxFit
-                                .cover, // Ensures the image fits within the given space
+                            width: 150,
+                            fit: BoxFit.cover,
                           ),
+
+                          // child: Image.memory(
+                          //   base64Decode(
+                          //       loginController.currentvehicle!.vehiclePhoto),
+                          //   height: 150,
+                          //   width: 150, // Added width to maintain aspect ratio
+                          //   fit: BoxFit
+                          //       .cover, // Ensures the image fits within the given space
+                          // ),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -992,7 +1025,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                getFirstWords(loginController.currentvehicle!.vehicleName, 2),
+                                getFirstWords(
+                                    loginController.currentvehicle!.vehicleName,
+                                    2),
                                 style: GoogleFonts.lato(
                                   color: primary,
                                   fontWeight: FontWeight.bold,
@@ -1348,8 +1383,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     image: DecorationImage(
-                                      image: MemoryImage(base64Decode(
-                                          selectedCar.vehiclePhoto)),
+                                      image: NetworkImage(
+                                          selectedCar.vehiclePhoto),
+
+                                      // image: MemoryImage(base64Decode(
+                                      //     selectedCar.vehiclePhoto)),
                                       fit: BoxFit.fill,
                                     ),
                                   ),

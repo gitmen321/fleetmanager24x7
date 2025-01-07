@@ -108,8 +108,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
     }
 
     _selectedLocation = selectedVehicle.vehicleLocation != null
-        ? LatLng(selectedVehicle.vehicleLocation!.latitude,
-            selectedVehicle.vehicleLocation!.longitude)
+        ? LatLng(
+          selectedVehicle.vehicleLocation?.latitude ?? 0.0,
+            selectedVehicle.vehicleLocation?.longitude ?? 0.0)
         : const LatLng(9.175249926873791, 76.5014099702239);
 
     locationDetails();
@@ -1072,10 +1073,18 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           children: [
                             ClipRRect(
                                 borderRadius: BorderRadius.circular(25),
-                                child: Image.memory(
-                                    base64Decode(selectedVehicle.vehiclePhoto),
-                                    height: 130,
-                                    width: 130)),
+                                child: Image.network(
+                                  selectedVehicle.vehiclePhoto,
+                                  height: 130,
+                                  width: 130,
+                                ),
+
+
+                                // child: Image.memory(
+                                //     base64Decode(selectedVehicle.vehiclePhoto),
+                                //     height: 130,
+                                //     width: 130)
+                                    ),
                           ],
                         ),
                       ),

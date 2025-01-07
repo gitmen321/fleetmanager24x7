@@ -54,7 +54,7 @@ Future<void> main() async {
     
   }
 
-  runApp(MyApp());
+  runApp(const MyApp());
   
   // Lock orientation to portrait mode
   SystemChrome.setPreferredOrientations([
