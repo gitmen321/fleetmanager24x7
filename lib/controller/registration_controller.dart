@@ -1,5 +1,6 @@
 import 'package:fleet_manager_driver_app/service/database.dart';
 import 'package:fleet_manager_driver_app/utils/color.dart';
+import 'package:fleet_manager_driver_app/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -112,7 +113,7 @@ class RegistrationController extends GetxController {
       print("Driver details saved successfully: $data");
 
       // Navigate to login screen
-      Get.offAllNamed('/login');
+      Get.offAll(LoginScreen());
     } catch (e) {
       print("Failed to save driver details: $e");
 
