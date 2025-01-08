@@ -8,34 +8,24 @@ import 'global.dart';
 
 
 class MongoDB {
+  static late Db db;
+  static late DbCollection driversCollection;
+
   static Future<Map<String, dynamic>> connect() async {
     try {
       db = await Db.create(MONGO_URL);
-      await db!.open();
+      await db.open();
+      driversCollection = db.collection('drivers');
       
-      // Initialize collections
-      collection_drivers = db!.collection(COLLECTION_DRIVERS);
-      collection_temp_vehicles = db!.collection(COLLECTION_TEMPVEHICLES);
-      collection_trips = db!.collection(COLLECTION_TRIPS);
-      collection_vehicles = db!.collection(COLLECTION_VEHICLES);
-      collection_scratch = db!.collection(COLLECTION_SCRATCHS);
-      collection_workshop = db!.collection(COLLECTION_WORKSHOPS);
-      collection_issues = db!.collection(COLLECTION_ISSUES);
-      collection_charts = db!.collection(COLLECTION_CHARTS);
-      collection_attendance = db!.collection('attendance');
-
-     
       print('Connected to MongoDB');
       
       // Return the db and drivers collection
       return {
         'db': db,
-        'collection_drivers': collection_drivers,
+        'collection_drivers': driversCollection,
       };
     } catch (e) {
       print('Failed to connect to MongoDB: $e');
-      
-      // Optionally, you can return null or handle offline cases here
       return {
         'db': null,
         'collection_drivers': null,
@@ -43,6 +33,71 @@ class MongoDB {
     }
   }
 }
+
+
+
+// class MongoDB {
+//    static late Db db;
+//   static late DbCollection driversCollection;
+
+//   static Future<Map<String, dynamic>> connect() async {
+//     try {
+//       db = await Db.create(MONGO_URL);
+//       await db.open();
+//       driversCollection = db.collection('drivers');
+//       // Initialize collections
+//       collection_drivers = db!.collection(COLLECTION_DRIVERS);
+//       collection_temp_vehicles = db!.collection(COLLECTION_TEMPVEHICLES);
+//       collection_trips = db!.collection(COLLECTION_TRIPS);
+//       collection_vehicles = db!.collection(COLLECTION_VEHICLES);
+//       collection_scratch = db!.collection(COLLECTION_SCRATCHS);
+//       collection_workshop = db!.collection(COLLECTION_WORKSHOPS);
+//       collection_issues = db!.collection(COLLECTION_ISSUES);
+//       collection_charts = db!.collection(COLLECTION_CHARTS);
+//       collection_attendance = db!.collection('attendance');
+
+
+     
+//       print('Connected to MongoDB');
+      
+//       // Return the db and drivers collection
+//       return {
+//         'db': db,
+//         'collection_drivers': collection_drivers,
+//       };
+//     } catch (e) {
+//       print('Failed to connect to MongoDB: $e');
+      
+//       // Optionally, you can return null or handle offline cases here
+//       return {
+//         'db': null,
+//         'collection_drivers': null,
+//       };
+//     }
+//   }
+// }
+
+// Future<void> registerDriver(Map<String, dynamic> driverData) async {
+//   try {
+//     final driverExists = await MongoDatabase.driversCollection.findOne({
+//       '\$or': [
+//         {'driverId': driverData['driverId']},
+//         {'mobileNumber': driverData['mobileNumber']}
+//       ]
+//     });
+
+//     if (driverExists != null) {
+//       throw Exception('Driver with this ID or Mobile Number already exists.');
+//     }
+
+//     await MongoDatabase.driversCollection.insert(driverData);
+//     print('Driver registered successfully');
+//   } catch (e) {
+//     print('Error registering driver: $e');
+//     rethrow;
+//   }
+// }
+
 
 
 Future<void> updateTempVehicleReading(vehicleNumber, odometerReading) async {

@@ -1,4 +1,5 @@
 import 'package:fleet_manager_driver_app/utils/color.dart';
+import 'package:fleet_manager_driver_app/view/registrations/name_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -290,7 +291,26 @@ class LoginScreen extends StatelessWidget {
                                 ),
                               );
                       }),
-                      const SizedBox(height: 20),
+                      // const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Haven't registered yet?", style: TextStyle(
+                            color: Color.fromARGB(172, 0, 0, 0)
+                          ),),
+                          TextButton(onPressed: (){
+                            Get.toNamed('/name');
+                            // Get.offAll(() => NameScreen());
+                          },
+                           child: const Text('Register',style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: primary
+                           ),),)
+                        ],
+                      ),
+                      const SizedBox(height: 10,)
+
+
                     ],
                   ),
                 ),
