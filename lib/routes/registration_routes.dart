@@ -2,7 +2,6 @@ import 'package:fleet_manager_driver_app/view/registrations/generate_id_screen.d
 import 'package:fleet_manager_driver_app/view/registrations/license_screen.dart';
 import 'package:fleet_manager_driver_app/view/registrations/mobile_screen.dart';
 import 'package:fleet_manager_driver_app/view/registrations/name_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RegistrationRoutes {

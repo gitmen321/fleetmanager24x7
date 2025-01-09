@@ -1,5 +1,4 @@
 import 'package:fleet_manager_driver_app/service/database.dart';
-import 'package:fleet_manager_driver_app/utils/color.dart';
 import 'package:fleet_manager_driver_app/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -64,11 +63,6 @@ class RegistrationController extends GetxController {
   Future<void> saveDriverDetails() async {
     try {
       // Ensure MongoDB is connected before proceeding
-      if (MongoDB.driversCollection == null) {
-        throw Exception("MongoDB driversCollection is not initialized");
-      }
-
-      // Log values for debugging
       print("Driver ID: ${driverIdController.text}");
       print("Password: ${passwordController.text}");
       print("Name: ${nameController.text}");

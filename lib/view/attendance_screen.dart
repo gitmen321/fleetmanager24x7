@@ -68,7 +68,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   final userId = loggedInUserId;  
   
   final driverId = loggedInDriverId;  
-  final driverUsername = loggedInName;  
+  // final driverUsername = loggedInName;  
   
 print(driverId);
 

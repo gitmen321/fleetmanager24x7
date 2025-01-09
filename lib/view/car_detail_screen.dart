@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:fleet_manager_driver_app/controller/home_controller.dart';
@@ -11,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+// import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -23,8 +22,7 @@ import '../service/database.dart';
 import 'navigation_screen.dart';
 
 class CarDetailScreen extends StatefulWidget {
-  const CarDetailScreen(this.vehicle, this._isStored, {Key? key})
-      : super(key: key);
+  const CarDetailScreen(this.vehicle, this._isStored, {super.key});
   final Vehicle vehicle;
   // final workshopMovement workshop;
   final bool _isStored;
@@ -66,8 +64,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
   }
 
   Future<void> _pickScratchImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.camera);
 
     if (image != null) {
       setState(() {
@@ -85,34 +83,34 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
           margin: const EdgeInsets.all(30),
           child: Column(
             children: [
-              SizedBox(
+             const SizedBox(
                 height: 20,
               ),
               buildDashboardBox(),
               widget._isStored == true ? buildBodyConditionBox() : Container(),
-              SizedBox(
+             const SizedBox(
                 height: 15,
               ),
               Divider(
                 color: greenlight.withOpacity(.3),
                 thickness: 1,
               ),
-              SizedBox(
+             const SizedBox(
                 height: 10,
               ),
               buildCheckBox(),
-              SizedBox(
+             const SizedBox(
                 height: 15,
               ),
               Divider(
                 color: greenlight.withOpacity(.3),
                 thickness: 1,
               ),
-              SizedBox(
+             const SizedBox(
                 height: 15,
               ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
+              const Padding(
+                padding: EdgeInsets.all(10.0),
                 child: Text('Do you want to report any new scratches?',
                     style:
                         TextStyle(color: primary, fontWeight: FontWeight.w500)),
@@ -153,19 +151,19 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                   controller: controller.issueController,
                   decoration: InputDecoration(
                     labelText: 'Enter Scratch Details',
-                    labelStyle: TextStyle(
+                    labelStyle: const TextStyle(
                         color: primary,
                         fontSize: 13,
                         fontWeight: FontWeight.w500),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: primary.withOpacity(.7)),
                     ),
-                    focusedBorder: UnderlineInputBorder(
+                    focusedBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: primary),
                     ),
                   ),
                 ),
-                SizedBox(
+               const SizedBox(
                   height: 20,
                 ),
                 Obx(
@@ -173,13 +171,13 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                       ? Image.file(_scratchImageFile.value!)
                       : Container(),
                 ),
-                SizedBox(
+               const SizedBox(
                   height: 5,
                 ),
                 Center(
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      elevation: MaterialStateProperty.all(5),
+                      elevation: WidgetStateProperty.all(5),
                       backgroundColor: WidgetStateProperty.all(primary),
                     ),
                     onPressed: () async {
@@ -189,7 +187,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.add_a_photo_rounded,
                           color: Colors.white,
                           size: 18,
@@ -209,7 +207,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 _scratchImageFile.value != null
                     ? Column(
                         children: [
-                          SizedBox(
+                         const SizedBox(
                             height: 10,
                           ),
                           ElevatedButton(
@@ -265,14 +263,14 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     : Container(),
               ],
 
-              SizedBox(
+             const SizedBox(
                 height: 15,
               ),
               Divider(
                 color: greenlight.withOpacity(.3),
                 thickness: 1,
               ),
-              SizedBox(
+             const SizedBox(
                 height: 15,
               ),
               // Row(
@@ -285,7 +283,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
               //         height: 140,
               //       ),
               //     ),
-              //     const SizedBox(width: 10,),
+              //     constconst SizedBox(width: 10,),
               //     Column(
               //       crossAxisAlignment: CrossAxisAlignment.center,
               //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -427,7 +425,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                             bool pinValidity =
                                 await controller.showSetPinOverLay();
                             if (pinValidity) {
-                              Get.offAll(() => HomeScreen());
+                              Get.offAll(() => const HomeScreen());
                             }
                             print("RELEASE CAR");
                           },
@@ -478,7 +476,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         height: 110,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          image: DecorationImage(
+          image: const DecorationImage(
             image: AssetImage('assets/image/dashboard.png'),
             fit: BoxFit.fill,
           ),
@@ -516,7 +514,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                               fontWeight: FontWeight.w900,
                               height: 1.2),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 5,
                         ),
                         SizedBox(
@@ -530,7 +528,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                             )),
                       ],
                     ),
-                    Icon(
+                    const Icon(
                       Icons.arrow_forward_ios_sharp,
                       color: Colors.white,
                       size: 25,
@@ -549,7 +547,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     return GestureDetector(
       onTap: () async {
         while (controller.isloading) {
-          await Future.delayed(Duration(seconds: 1));
+          await Future.delayed(const Duration(seconds: 1));
         }
         print("Body Condition");
         if (controller.scratchData != null) {
@@ -563,7 +561,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         height: 110,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          image: DecorationImage(
+          image: const DecorationImage(
             image: AssetImage('assets/image/body_condition.png'),
             fit: BoxFit.fill,
           ),
@@ -602,7 +600,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                                   fontWeight: FontWeight.w900,
                                   height: 1.2,
                                 ))),
-                        SizedBox(
+                        const SizedBox(
                           height: 5,
                         ),
                         SizedBox(
@@ -616,7 +614,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                             )),
                       ],
                     ),
-                    Icon(
+                    const Icon(
                       Icons.arrow_forward_ios_sharp,
                       color: Colors.white,
                       size: 25,
@@ -714,19 +712,19 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                   ],
                   decoration: InputDecoration(
                     labelText: "Odometer Reading",
-                    labelStyle: TextStyle(
+                    labelStyle: const TextStyle(
                         color: primary,
                         fontSize: 13,
                         fontWeight: FontWeight.w500),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: primary.withOpacity(.7)),
                     ),
-                    focusedBorder: UnderlineInputBorder(
+                    focusedBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: primary),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 TextFormField(
@@ -737,19 +735,19 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                   ],
                   decoration: InputDecoration(
                     labelText: 'Fuel Level',
-                    labelStyle: TextStyle(
+                    labelStyle: const TextStyle(
                         color: primary,
                         fontSize: 13,
                         fontWeight: FontWeight.w500),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: primary.withOpacity(.7)),
                     ),
-                    focusedBorder: UnderlineInputBorder(
+                    focusedBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: primary),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Obx(
@@ -760,7 +758,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 Center(
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      elevation: MaterialStateProperty.all(5),
+                      elevation: WidgetStateProperty.all(5),
                       backgroundColor: WidgetStateProperty.all(primary),
                     ),
                     onPressed: () async {
@@ -770,7 +768,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.add_a_photo_rounded,
                           color: Colors.white,
                           size: 18,
@@ -799,7 +797,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                   });
                   print(controller.isDashboard);
                 },
-                child: Text(
+                child: const Text(
                   "CANCEL",
                   style: TextStyle(
                       color: primary,
@@ -850,7 +848,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                   }
                   Navigator.of(context).pop();
                 },
-                child: Text(
+                child: const Text(
                   "SUBMIT",
                   style: TextStyle(
                       color: primary,

@@ -14,8 +14,7 @@ import '../model/vehicle.dart';
 import '../model/vehicleLocation.dart';
 import '../service/global.dart';
 
-
-class LoginController extends GetxController{
+class LoginController extends GetxController {
   User? user;
   Trip? currentTrip;
   ChartData? chartData;
@@ -31,47 +30,59 @@ class LoginController extends GetxController{
   List<FlSpot> spots = [];
   int? totalTripsThisYear;
 
-@override
+  @override
   Future<void> onInit() async {
     super.onInit();
+
+    // Reset state variables
+    currentTrip = null; // Ensure no leftover trip from previous login
+    trips.clear(); // Clear trips list
+    vehicles.clear(); // Clear vehicles list if applicable
+
+     print("State reset: currentTrip = $currentTrip, trips cleared: ${trips.isEmpty}");
+
     isloading(true);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('userName') && prefs.containsKey('password') && prefs.containsKey('id'))
-      print(prefs.getString('userName')!);
-      loggedInUserId = prefs.getString('id')!;
-      loggedInDriverId = prefs.getString('driverId')!;
-      //loggedInName = prefs.getString('userName')!;
 
+    if (prefs.containsKey('userName') &&
+        prefs.containsKey('password') &&
+        prefs.containsKey('id')) {
+         print(prefs.getString('userName')!);
+    loggedInUserId = prefs.getString('id')!;
+    loggedInDriverId = prefs.getString('driverId')!;
+    
+        }
 
-    var driver = await collection_drivers?.findOne(where.eq('_id', ObjectId.parse(loggedInUserId)));
+    var driver = await collection_drivers
+        ?.findOne(where.eq('_id', ObjectId.parse(loggedInUserId)));
 
-  // var driver = await collection_drivers?.findOne(where.eq('_id', ObjectId.parse(loggedInUserId)));
+    // var driver = await collection_drivers?.findOne(where.eq('_id', ObjectId.parse(loggedInUserId)));
     if (driver != null) {
       isLoggedIn(true);
       print("driver adding started................");
       List<String> trips = [];
       for (var trip in driver['trips']) {
-      trips.add(trip.toHexString());
-    }
+        trips.add(trip.toHexString());
+      }
       user = User(
-          driver['_id'].toHexString(),
-          driver['driverId'],
-          driver['driverPassword'],
-          driver['driverPin'],
-          driver['driverName'],
-          driver['mobileNumber'],
-          driver['location'],
-          driver['driverLicenceNumber'],
-          driver['driverLicenceExpiryDate'],
-          driver['driverPhoto'],
-          driver['notes'],
-          driver['status'],
-          trips,
+        driver['_id'].toHexString(),
+        driver['driverId'],
+        driver['driverPassword'],
+        driver['driverPin'],
+        driver['driverName'],
+        driver['mobileNumber'],
+        driver['location'],
+        driver['driverLicenceNumber'],
+        driver['driverLicenceExpiryDate'],
+        driver['driverPhoto'],
+        driver['notes'],
+        driver['status'],
+        trips,
       );
       print("driver Adder............");
     }
-  isLoggedIn(true);
-  fetchTripsAndVehicles();
+    isLoggedIn(true);
+    fetchTripsAndVehicles();
   }
 
   Future<void> fetchTripsAndVehicles() async {
@@ -80,7 +91,8 @@ class LoginController extends GetxController{
     //     .toList();
 
     var globalTrips = await collection_trips
-        ?.find(where.oneFrom('_id', user!.trips.map((id) => ObjectId.parse(id)).toList()))
+        ?.find(where.oneFrom(
+            '_id', user!.trips.map((id) => ObjectId.parse(id)).toList()))
         .toList();
 
     if (globalTrips!.isNotEmpty) {
@@ -111,13 +123,15 @@ class LoginController extends GetxController{
           trip['odometerEndImage'],
         ));
 
-        if (!vehicles.any((car) => car.vehicleNumber == trip["vehicleNumber"])) {
+        if (!vehicles
+            .any((car) => car.vehicleNumber == trip["vehicleNumber"])) {
           var vehicle = await collection_vehicles
               ?.findOne(where.eq('vehicleNumber', trip['vehicleNumber']));
           if (vehicle != null) {
-            print("fetching vehicle started.............. ${vehicle['vehicleName']}");
+            print(
+                "fetching vehicle started.............. ${vehicle['vehicleName']}");
             List<String> vehiclePhoto =
-            List<String>.from(vehicle['vehiclePhotos'] ?? []);
+                List<String>.from(vehicle['vehiclePhotos'] ?? []);
             print(vehicle['vehicleName']);
             vehicles.add(Vehicle(
               vehicle['vehicleName'],
@@ -133,7 +147,9 @@ class LoginController extends GetxController{
               vehicle['istimaraPhoto'],
               vehiclePhoto,
               vehicle['vehicleStatus'],
-              vehicle['vehicleLocation'] != null ? VehicleLocation.fromMap(vehicle['vehicleLocation']) : null,
+              vehicle['vehicleLocation'] != null
+                  ? VehicleLocation.fromMap(vehicle['vehicleLocation'])
+                  : null,
               vehicle['notesAboutVehicle'],
               vehicle['rentalAgreement'],
               vehicle['lastServiceDate'],
@@ -141,7 +157,6 @@ class LoginController extends GetxController{
               vehicle['keyCustody'],
             ));
             print("vehicle ${vehicle['vehicleName']} added.............. ");
-
           }
         } else {
           print('Vehicle already added');
@@ -154,34 +169,28 @@ class LoginController extends GetxController{
     assignTrip();
   }
 
-  getChartData()async {
-    var globalchartData = await collection_charts?.findOne(where.eq('driverId', ObjectId.parse(loggedInUserId)));
+  getChartData() async {
+    var globalchartData = await collection_charts
+        ?.findOne(where.eq('driverId', ObjectId.parse(loggedInUserId)));
     if (globalchartData != null) {
       List<DateTime> tripDate = [];
       for (var trip in globalchartData['date']) {
         tripDate.add(trip);
       }
-      chartData = ChartData(
-          globalchartData['driverId'].toHexString(),
-          globalchartData['totalHours'],
-          tripDate
-      );
-    }
-    else {
+      chartData = ChartData(globalchartData['driverId'].toHexString(),
+          globalchartData['totalHours'], tripDate);
+    } else {
       var newChartData = {
         'driverId': ObjectId.parse(loggedInUserId),
         'totalHours': 0.0,
         'date': []
       };
       await collection_charts?.insertOne(newChartData);
-      chartData = ChartData(
-          loggedInUserId,
-          0,
-          []
-      );
+      chartData = ChartData(loggedInUserId, 0, []);
       print('New chart data created for driverId: $loggedInUserId');
     }
-    spots = List.generate(12, (index) => FlSpot(index + 1, getTripsForMonth(index + 1).toDouble()));
+    spots = List.generate(12,
+        (index) => FlSpot(index + 1, getTripsForMonth(index + 1).toDouble()));
     getTotalTripsThisYear();
     print(spots);
     isloading(false);
@@ -189,19 +198,18 @@ class LoginController extends GetxController{
 
   void getTotalTripsThisYear() {
     int currentYear = DateTime.now().year;
-    totalTripsThisYear = chartData==null?0:chartData!.date.where((date) => date.year == currentYear).length;
+    totalTripsThisYear = chartData == null
+        ? 0
+        : chartData!.date.where((date) => date.year == currentYear).length;
   }
 
   List<int> getTripsPerMonthThisYear() {
-    int currentYear = DateTime
-        .now()
-        .year;
+    int currentYear = DateTime.now().year;
     List<int> tripsPerMonth = List<int>.filled(12, 0);
 
     if (chartData == null) {
       return tripsPerMonth;
-    }
-    else {
+    } else {
       for (var date in chartData!.date) {
         if (date.year == currentYear) {
           tripsPerMonth[date.month - 1]++;
@@ -216,28 +224,26 @@ class LoginController extends GetxController{
     return tripsPerMonth[month - 1];
   }
 
-
   void assignTrip() {
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
 
-    // currentTrip = trips
-    //     .where((trip) => trip.tripDate.year == today.year &&
-    //     trip.tripDate.month == today.month &&
-    //     trip.tripDate.day == today.day)
-    //     .reduce((a, b) => a.tripDate.isBefore(b.tripDate) ? a : b);
+     print("Assigning trip... Total trips available: ${trips.length}");
 
+  
     var filteredTrips = trips.where((trip) =>
-    trip.tripEndTimeDriver == null &&
-        trip.tripDate.year == today.year &&
-        (trip.tripDate.month == today.month || trip.tripEndTime.month >= today.month)
+            trip.tripEndTimeDriver == null &&
+            trip.tripDate.year == today.year &&
+            (trip.tripDate.month == today.month ||
+                trip.tripEndTime.month >= today.month)
         // trip.tripEndTime.day >= today.day
         // trip.tripDate.day == today.day
-    );
+        );
 
     if (filteredTrips.isNotEmpty) {
       print('Filtered Trips: ${filteredTrips.length}');
-      currentTrip = filteredTrips.reduce((a, b) => a.tripDate.isBefore(b.tripDate) ? a : b);
+      currentTrip = filteredTrips
+          .reduce((a, b) => a.tripDate.isBefore(b.tripDate) ? a : b);
       print('Current Trip: ${currentTrip!.tripNumber}');
       if (currentTrip!.tripEndTimeDriver == null) {
         print('Current Trip: ${currentTrip!.tripNumber}');
@@ -249,18 +255,16 @@ class LoginController extends GetxController{
       currentTrip = null;
     }
     if (currentTrip != null) {
-
       print('Current Trip: ${currentTrip!.tripNumber}');
       asignVehicle();
     } else {
       print('No trips for today.');
     }
-
   }
 
   void asignVehicle() {
     currentvehicle = vehicles.firstWhere(
-            (vehicle) => vehicle.vehicleNumber == currentTrip?.vehicleNumber);
+        (vehicle) => vehicle.vehicleNumber == currentTrip?.vehicleNumber);
     if (currentvehicle != null) {
       print('Vehicle assigned: ${currentvehicle!.vehicleNumber}');
     } else {
@@ -268,81 +272,83 @@ class LoginController extends GetxController{
     }
   }
 
-  login(TextEditingController usernameController, TextEditingController passwordController, RxDouble progress) async {
-  try {
-    isloading(true);  // Start the loading process
-    progress.value = 0.1; // Initial progress when starting the login process
+  login(TextEditingController usernameController,
+      TextEditingController passwordController, RxDouble progress) async {
+    try {
+      isloading(true); // Start the loading process
+      progress.value = 0.1; // Initial progress when starting the login process
 
-    // Simulate a network delay (optional)
-    await Future.delayed(const Duration(milliseconds: 300));
+      // Simulate a network delay (optional)
+      await Future.delayed(const Duration(milliseconds: 300));
 
-    // Fetching the driver data from MongoDB
-    var driver = await collection_drivers?.findOne(where.eq('driverId', usernameController.text));
+      // Fetching the driver data from MongoDB
+      var driver = await collection_drivers
+          ?.findOne(where.eq('driverId', usernameController.text));
 
-    progress.value = 0.3; // Progress after fetching data
-    
+      progress.value = 0.3; // Progress after fetching data
 
-    if (driver != null) {
-      if (usernameController.text == driver['driverId'] && passwordController.text == driver['driverPassword']) {
-        loggedInUserId = driver['_id'].toHexString();
-         loggedInDriverId = driver['driverId'];
-       // loggedInName = driver['driverName'];
+      if (driver != null) {
+        if (usernameController.text == driver['driverId'] &&
+            passwordController.text == driver['driverPassword']) {
+          loggedInUserId = driver['_id'].toHexString();
+          loggedInDriverId = driver['driverId'];
+          // loggedInName = driver['driverName'];
 
+          progress.value =
+              0.5; // Progress after successful login credentials check
 
-        progress.value = 0.5; // Progress after successful login credentials check
+          // Extract trips
+          List<String> trips = [];
+          for (var trip in driver['trips']) {
+            trips.add(trip.toHexString());
+          }
 
-        // Extract trips
-        List<String> trips = [];
-        for (var trip in driver['trips']) {
-          trips.add(trip.toHexString());
+          // Update the user model
+          user = User(
+            driver['_id'].toHexString(),
+            driver['driverId'],
+            driver['driverPassword'],
+            driver['driverPin'],
+            driver['driverName'],
+            driver['mobileNumber'],
+            driver['location'],
+            driver['driverLicenceNumber'],
+            driver['driverLicenceExpiryDate'],
+            driver['driverPhoto'],
+            driver['notes'],
+            driver['status'],
+            trips,
+          );
+
+          progress.value = 0.7; // Progress after updating the user model
+
+          // Storing login details in SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('userName', usernameController.text);
+          prefs.setString('password', passwordController.text);
+          prefs.setString('driverId', loggedInDriverId); // added
+          prefs.setString('id', loggedInUserId);
+
+          progress.value =
+              0.9; // Progress after saving data in SharedPreferences
+
+          // Fetch trips and vehicles
+          await fetchTripsAndVehicles(); // Make sure this function is async if it performs an async operation
+
+          progress.value =
+              1.0; // Progress reaches 100% when everything is complete
+
+          return true;
         }
-
-        // Update the user model
-        user = User(
-          driver['_id'].toHexString(),
-          driver['driverId'],
-          driver['driverPassword'],
-          driver['driverPin'],
-          driver['driverName'],
-          driver['mobileNumber'],
-          driver['location'],
-          driver['driverLicenceNumber'],
-          driver['driverLicenceExpiryDate'],
-          driver['driverPhoto'],
-          driver['notes'],
-          driver['status'],
-          trips,
-        );
-
-        progress.value = 0.7; // Progress after updating the user model
-
-        // Storing login details in SharedPreferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('userName', usernameController.text);
-        prefs.setString('password', passwordController.text);
-        prefs.setString('driverId', loggedInDriverId);// added
-        prefs.setString('id', loggedInUserId);
-        
-
-        progress.value = 0.9; // Progress after saving data in SharedPreferences
-
-        // Fetch trips and vehicles
-        await fetchTripsAndVehicles(); // Make sure this function is async if it performs an async operation
-
-        progress.value = 1.0; // Progress reaches 100% when everything is complete
-
-        return true;
       }
+
+      progress.value =
+          1.0; // If login fails, set progress to 100% and return false
+      return false;
+    } finally {
+      isloading(false); // Stop the loader
     }
-
-    progress.value = 1.0; // If login fails, set progress to 100% and return false
-    return false;
-  } finally {
-    isloading(false); // Stop the loader
   }
-}
-
-
 
   showSetPinOverLay() async {
     Get.bottomSheet(
@@ -361,84 +367,89 @@ class LoginController extends GetxController{
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                     const Text(
-                    'SET SECURITY PIN',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: primary),
+                    const Text(
+                      'SET SECURITY PIN',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: primary),
                     ),
-
                     const SizedBox(height: 20),
-                     Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
-                       decoration: BoxDecoration(
-                         borderRadius: BorderRadius.circular(30),
-                         color: greenlight.withOpacity(.1),
-                       ),
-                       child: Obx(() =>
-                           TextFormField(
-                         controller: pinController1,
-                         obscureText: _obscureText1.value,
-                         maxLength: 4,
-                         keyboardType: TextInputType.number,
-                         inputFormatters: <TextInputFormatter>[
-                           FilteringTextInputFormatter.digitsOnly
-                         ],
-                        decoration: InputDecoration(
-                          counterText: "",
-                          prefixIcon: const Icon(Icons.password),
-                          prefixIconColor: primary,
-                          border: InputBorder.none,
-                          labelText: 'PIN',
-                          labelStyle: const TextStyle(color: primary, fontSize: 15, fontWeight: FontWeight.w600),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscureText1.value
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: primary,
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        color: greenlight.withOpacity(.1),
+                      ),
+                      child: Obx(() => TextFormField(
+                            controller: pinController1,
+                            obscureText: _obscureText1.value,
+                            maxLength: 4,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              counterText: "",
+                              prefixIcon: const Icon(Icons.password),
+                              prefixIconColor: primary,
+                              border: InputBorder.none,
+                              labelText: 'PIN',
+                              labelStyle: const TextStyle(
+                                  color: primary,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureText1.value
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: primary,
+                                ),
+                                onPressed: () => _obscureText1.toggle(),
+                              ),
                             ),
-                            onPressed: () => _obscureText1.toggle(),
-                          ),
-                        ),
-                       )
-                       ),
-                     ),
+                          )),
+                    ),
                     const SizedBox(height: 20),
-                     Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
-                       decoration: BoxDecoration(
-                         borderRadius: BorderRadius.circular(30),
-                         color: greenlight.withOpacity(.1),
-                       ),
-                       child: Obx(() =>
-                           TextFormField(
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        color: greenlight.withOpacity(.1),
+                      ),
+                      child: Obx(
+                        () => TextFormField(
                           controller: pinController2,
-                         obscureText: _obscureText2.value,
-                         maxLength: 4,
-                         keyboardType: TextInputType.number,
-                         inputFormatters: <TextInputFormatter>[
-                           FilteringTextInputFormatter.digitsOnly
-                         ],
-                        decoration: InputDecoration(
-                          counterText: "",
-                          prefixIcon: const Icon(Icons.password),
-                          prefixIconColor: primary,
-                          border: InputBorder.none,
-                          labelText: 'CONFIRM PIN',
-                          labelStyle: const TextStyle(color: primary, fontSize: 15, fontWeight: FontWeight.w600),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscureText2.value
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: primary,
+                          obscureText: _obscureText2.value,
+                          maxLength: 4,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: InputDecoration(
+                            counterText: "",
+                            prefixIcon: const Icon(Icons.password),
+                            prefixIconColor: primary,
+                            border: InputBorder.none,
+                            labelText: 'CONFIRM PIN',
+                            labelStyle: const TextStyle(
+                                color: primary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureText2.value
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: primary,
+                              ),
+                              onPressed: () => _obscureText2.toggle(),
                             ),
-                            onPressed: () => _obscureText2.toggle(),
                           ),
                         ),
-                       ),
-                       ),
-                     ),
-
+                      ),
+                    ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -452,7 +463,8 @@ class LoginController extends GetxController{
                         if (pinController1.text == pinController2.text) {
                           await collection_drivers?.update(
                             where.eq('_id', ObjectId.parse(loggedInUserId)),
-                            modify.set('driverPin', int.parse(pinController1.text)),
+                            modify.set(
+                                'driverPin', int.parse(pinController1.text)),
                           );
                           print(pinController1.text);
                           print('Pin set');
@@ -465,7 +477,11 @@ class LoginController extends GetxController{
                           createToastTop('Pin not match');
                         }
                       },
-                      child: const Text('Set Pin', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+                      child: const Text('Set Pin',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600)),
                     ),
                     const SizedBox(height: 20),
                   ],

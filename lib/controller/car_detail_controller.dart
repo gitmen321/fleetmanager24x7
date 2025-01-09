@@ -39,9 +39,6 @@ class CarDetailController extends GetxController {
 
   void getScratchdata(Vehicle selectedVehicle) async {
     isloading = true;
-    if (selectedVehicle.vehicleNumber == null) {
-      return;
-    }
     try {
       var scratch = await collection_scratch?.findOne(
         where.eq('vehicleNumber', selectedVehicle.vehicleNumber),

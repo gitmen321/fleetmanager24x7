@@ -7,8 +7,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../model/scratch.dart';
 class BodyConditionScreen extends StatefulWidget {
-  const BodyConditionScreen(this.scratchData,this._isStored,{Key? key}) : super(key: key);
+  const BodyConditionScreen(this.scratchData,this._isStored,{super.key});
   final Scratch scratchData;
+  // ignore: unused_field
   final bool _isStored;
 
   @override

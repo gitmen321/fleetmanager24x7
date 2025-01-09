@@ -17,15 +17,15 @@ class MongoDB {
       await db.open();
       driversCollection = db.collection('drivers');
       // Initialize collections
-      collection_drivers = db!.collection(COLLECTION_DRIVERS);
-      collection_temp_vehicles = db!.collection(COLLECTION_TEMPVEHICLES);
-      collection_trips = db!.collection(COLLECTION_TRIPS);
-      collection_vehicles = db!.collection(COLLECTION_VEHICLES);
-      collection_scratch = db!.collection(COLLECTION_SCRATCHS);
-      collection_workshop = db!.collection(COLLECTION_WORKSHOPS);
-      collection_issues = db!.collection(COLLECTION_ISSUES);
-      collection_charts = db!.collection(COLLECTION_CHARTS);
-      collection_attendance = db!.collection('attendance');
+      collection_drivers = db.collection(COLLECTION_DRIVERS);
+      collection_temp_vehicles = db.collection(COLLECTION_TEMPVEHICLES);
+      collection_trips = db.collection(COLLECTION_TRIPS);
+      collection_vehicles = db.collection(COLLECTION_VEHICLES);
+      collection_scratch = db.collection(COLLECTION_SCRATCHS);
+      collection_workshop = db.collection(COLLECTION_WORKSHOPS);
+      collection_issues = db.collection(COLLECTION_ISSUES);
+      collection_charts = db.collection(COLLECTION_CHARTS);
+      collection_attendance = db.collection('attendance');
 
 
      

@@ -14,7 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 // import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+// import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -600,8 +600,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
               ),
               TextButton(
                 onPressed: () async {
-                  if (controller.messageController.text != '' &&
-                      _SOSimageFile != null) {
+                  if (controller.messageController.text != '') {
                     try {
                       final Uint8List bytes =
                           await _SOSimageFile.value!.readAsBytes();
@@ -624,6 +623,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   }
                   _SOSimageFile = Rx<File?>(null);
                   controller.messageController.clear();
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
                 },
                 child: const Text(
@@ -855,8 +855,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 onPressed: () async {
                   onPauseTrip();
                   if (odometerController.text != '' &&
-                      fuelController.text != '' &&
-                      _odometerimageFile != null) {
+                      fuelController.text != '') {
                     bool pinValidity = await showCheckPinOverLay();
                     if (pinValidity) {
                       if (_issueSelection == 'yes') {
