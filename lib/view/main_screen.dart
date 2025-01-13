@@ -134,8 +134,8 @@ class _MainScreenState extends State<MainScreen> {
         leading: Builder(
           builder: (context) => GestureDetector(
             child: Container(
-              margin: EdgeInsets.only(left: 25, top: 15),
-              child: Icon(Icons.menu_rounded, color: greenlight, size: 40.0),
+              margin: const EdgeInsets.only(left: 25, top: 15),
+              child: const Icon(Icons.menu_rounded, color: greenlight, size: 40.0),
             ),
             onTap: () {
               Scaffold.of(context).openDrawer();

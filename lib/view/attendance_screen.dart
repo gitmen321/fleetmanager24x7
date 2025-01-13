@@ -42,7 +42,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         isCheckedIn = storedIsCheckedIn;
         checkInDateTime = DateTime.parse(storedCheckInTime);
         buttonText = isCheckedIn ? "Check Out" : "Check In";
-        checkinTime = "Checked-in at ${DateFormat('hh:mm a').format(checkInDateTime!)}";
+        checkinTime =
+            "Checked-in at ${DateFormat('hh:mm a').format(checkInDateTime!)}";
         if (isCheckedIn) {
           startTimer();
         }
@@ -50,11 +51,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
-  Future<void> _saveCheckInStatus(bool isCheckedIn, DateTime? checkInDateTime) async {
+  Future<void> _saveCheckInStatus(
+      bool isCheckedIn, DateTime? checkInDateTime) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isCheckedIn', isCheckedIn);
     if (checkInDateTime != null) {
-      await prefs.setString('checkInDateTime', checkInDateTime.toIso8601String());
+      await prefs.setString(
+          'checkInDateTime', checkInDateTime.toIso8601String());
     }
   }
 
@@ -65,48 +68,122 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   void _onCheckInOutPressed() async {
-  final userId = loggedInUserId;  
-  
-  final driverId = loggedInDriverId;  
-  // final driverUsername = loggedInName;  
-  
-print(driverId);
+    final userId = loggedInUserId;
+    final driverId = loggedInDriverId;
+    final now = DateTime.now();
 
-  if (!isCheckedIn) {
-    // Check-in logic
-    setState(() {
-      isCheckedIn = true;
-      buttonText = "Check Out";
-      checkInDateTime = DateTime.now();
-      checkinTime = "Checked-in at ${DateFormat('hh:mm a').format(checkInDateTime!)}";
-      startTimer();
-    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasCompletedFirstCheckInToday =
+        prefs.getBool('hasCompletedFirstCheckInToday') ?? false;
 
-    // Save the check-in status and time locally
-    await _saveCheckInStatus(isCheckedIn, checkInDateTime);
+    if (isCheckedIn) {
+      final elapsed = now.difference(checkInDateTime!).inMinutes;
 
-    // Call the MongoDB check-in function
-    await checkInAttendance(userId, driverId,);
+      // Restrict checkout if required time not met
+      if (!hasCompletedFirstCheckInToday && elapsed < 3 * 60) {
+        _showToast("You can only check out after completing 3 Hours.");//for testing
+        return;
+      }
 
-    _showToast("Attendance marked successfully");
-  } else {
-    // Check-out logic
-    setState(() {
-      isCheckedIn = false;
-      buttonText = "Check In";
-      _timer?.cancel(); // Stop the timer when checked out
-      percentage = 0.0; // Reset the progress
-    });
+      // Checkout allowed
+      setState(() {
+        isCheckedIn = false;
+        buttonText = "Check In";
+        _timer?.cancel();
+        percentage = 0.0;
+      });
 
-    // Clear the check-in status locally
-    await _clearCheckInStatus();
+      await prefs.setBool('hasCompletedFirstCheckInToday', true);
+      await _clearCheckInStatus();
 
-    // Call the MongoDB check-out function
-    await checkOutAttendance(userId);
+      await checkOutAttendance(userId);
 
-    _showToast("Attendance mark ended successfully");
+      _showToast("Checked out successfully.");
+    } else {
+      // Check-In logic
+      setState(() {
+        isCheckedIn = true;
+        buttonText = "Check Out";
+        checkInDateTime = now;
+        checkinTime = "Checked-in at ${DateFormat('hh:mm a').format(now)}";
+        startTimer();
+      });
+
+      await _saveCheckInStatus(isCheckedIn, checkInDateTime);
+      await checkInAttendance(userId, driverId);
+
+      _showToast("Checked in successfully.");
+    }
   }
-}
+
+//  void _onCheckInOutPressed() async {
+//   final userId = loggedInUserId;
+//   final driverId = loggedInDriverId;
+
+//   // Get the current date and time
+//   final now = DateTime.now();
+//   final today = DateFormat('yyyy-MM-dd').format(now);
+
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   String? lastCheckInDate = prefs.getString('lastCheckInDate');
+//   bool? hasCompletedFirstCheckInToday = prefs.getBool('hasCompletedFirstCheckInToday') ?? false;
+
+//   if (isCheckedIn) {
+//     // If the user is already checked in, calculate elapsed time
+//     final elapsed = now.difference(checkInDateTime!).inMinutes;
+
+//     // Restrict checkout only for the first check-in of the day
+//     if (!hasCompletedFirstCheckInToday && elapsed < 1) {
+//       _showToast("You can only check out after completing 12 Hours");
+//       return;
+//     }
+
+//     // Allow checkout
+//     setState(() {
+//       isCheckedIn = false;
+//       buttonText = "Check In";
+//       _timer?.cancel(); // Stop the timer
+//       percentage = 0.0; // Reset progress
+//     });
+
+//     // Update the flag for first check-in completion
+//     if (!hasCompletedFirstCheckInToday) {
+//       await prefs.setBool('hasCompletedFirstCheckInToday', true);
+//     }
+
+//     // Clear the check-in status locally
+//     await _clearCheckInStatus();
+
+//     // Call the MongoDB checkout function
+//     await checkOutAttendance(userId);
+
+//     _showToast("Checked out successfully.");
+//   } else {
+//     // Check-in logic
+//     if (lastCheckInDate != null && lastCheckInDate == today) {
+//       // Allow subsequent check-ins and checkouts without restriction
+//       _showToast("You can check in again for today.");
+//     }
+
+//     // Proceed with check-in
+//     setState(() {
+//       isCheckedIn = true;
+//       buttonText = "Check Out";
+//       checkInDateTime = now;
+//       checkinTime = "Checked-in at ${DateFormat('hh:mm a').format(now)}";
+//       startTimer();
+//     });
+
+//     // Save the check-in status and time locally
+//     await _saveCheckInStatus(isCheckedIn, checkInDateTime);
+//     await prefs.setString('lastCheckInDate', today);
+
+//     // Call the MongoDB check-in function
+//     await checkInAttendance(userId, driverId);
+
+//     _showToast("Checked in successfully.");
+//   }
+// }
 
   void startTimer() {
     const oneMinute = Duration(minutes: 1);
@@ -119,21 +196,27 @@ print(driverId);
 
   void calculateProgress() {
     if (checkInDateTime != null) {
-        final now = DateTime.now();
-        final elapsed = now.difference(checkInDateTime!).inMinutes; // Elapsed minutes since check-in
+      final now = DateTime.now();
+      final elapsed = now
+          .difference(checkInDateTime!)
+          .inMinutes; // Elapsed minutes since check-in
 
-        // For testing: change 12 * 60 (720 minutes for 12 hours) to a smaller value
-        const totalMinutes = 12 * 60; // For testing, set total to 12 minutes
+      // For testing: change 12 * 60 (720 minutes for 12 hours) to a smaller value
 
-        setState(() {
-            percentage = elapsed / totalMinutes;
-            if (percentage >= 1.0) {
-                percentage = 1.0; // Cap at 100% once 12 minutes have passed (for testing)
-                _timer?.cancel(); // Stop the timer when the period is over
-            }
-        });
+      
+      const totalMinutes = 3 * 60; // 3 hours in minutes for testing
+
+
+      setState(() {
+        percentage = elapsed / totalMinutes;
+        if (percentage >= 1.0) {
+          percentage =
+              1.0; // Cap at 100% once 12 minutes have passed (for testing)
+          _timer?.cancel(); // Stop the timer when the period is over
+        }
+      });
     }
-}
+  }
 
   void _showToast(String message) {
     Fluttertoast.showToast(
@@ -150,8 +233,11 @@ print(driverId);
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 50,
-        title:  Text("Attendance", style:  GoogleFonts.lato(
-                color: secondary, fontSize: 20, fontWeight: FontWeight.w700),),
+        title: Text(
+          "Attendance",
+          style: GoogleFonts.lato(
+              color: secondary, fontSize: 20, fontWeight: FontWeight.w700),
+        ),
         backgroundColor: primary,
       ),
       backgroundColor: secondary,
@@ -168,7 +254,8 @@ print(driverId);
                 const SizedBox(width: 10),
                 Text(
                   currentDate,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -183,7 +270,9 @@ print(driverId);
                   Text(
                     currentTime,
                     style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   ),
                   const SizedBox(height: 10),
                   const Text("Today",
@@ -196,19 +285,26 @@ print(driverId);
             // Check-in time display
             Text(
               checkinTime,
-              style: const TextStyle(color: Colors.green, fontSize: 14, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.green,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
             // Check In/Out Button
             ElevatedButton(
               onPressed: _onCheckInOutPressed,
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 backgroundColor: primary, // Button background color
               ),
               child: Text(
                 buttonText,
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ],

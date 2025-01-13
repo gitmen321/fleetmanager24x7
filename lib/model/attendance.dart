@@ -38,66 +38,6 @@ class Attendance {
   }
 }
 
-// // New class to store individual attendance records
-// class AttendanceRecord {
-//   final DateTime checkInTime;
-//   final DateTime? checkOutTime;
-
-//   AttendanceRecord({
-//     required this.checkInTime,
-//     this.checkOutTime,
-//   });
-
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'checkInTime': checkInTime.toIso8601String(),
-//       'checkOutTime': checkOutTime?.toIso8601String(),
-//     };
-//   }
-
-//   factory AttendanceRecord.fromMap(Map<String, dynamic> map) {
-//     return AttendanceRecord(
-//       checkInTime: DateTime.parse(map['checkInTime']),
-//       checkOutTime: map['checkOutTime'] != null ? DateTime.parse(map['checkOutTime']) : null,
-//     );
-//   }
-// }
-
-// class AttendanceRecord {
-//   final DateTime checkInDate;
-//   final String checkInTime;
-//   final DateTime? checkOutDate;
-//   final String? checkOutTime;
-//   final double overtime; // Overtime in hours, default is 0.
-
-//   AttendanceRecord({
-//     required this.checkInDate,
-//     required this.checkInTime,
-//     this.checkOutDate,
-//     this.checkOutTime,
-//     this.overtime = 0.0,
-//   });
-
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'checkInDate': checkInDate.toIso8601String(),
-//       'checkInTime': checkInTime,
-//       'checkOutDate': checkOutDate?.toIso8601String(),
-//       'checkOutTime': checkOutTime,
-//       'overtime': overtime,
-//     };
-//   }
-
-//   factory AttendanceRecord.fromMap(Map<String, dynamic> map) {
-//     return AttendanceRecord(
-//       checkInDate: DateTime.parse(map['checkInDate']),
-//       checkInTime: map['checkInTime'],
-//       checkOutDate: map['checkOutDate'] != null ? DateTime.parse(map['checkOutDate']) : null,
-//       checkOutTime: map['checkOutTime'],
-//       overtime: (map['overtime'] ?? 0.0).toDouble(),
-//     );
-//   }
-// }
 
 class AttendanceRecord {
   final DateTime checkInDate;

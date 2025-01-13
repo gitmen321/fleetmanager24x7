@@ -49,6 +49,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final odometerController = TextEditingController();
   final fuelController = TextEditingController();
   bool mapEnabled = false;
+
   // final LocationUpdateService _locationUpdateService = LocationUpdateService(vehicleNumber);
 
   LatLng _selectedLocation = const LatLng(9.175249926873791, 76.5014099702239);
@@ -108,8 +109,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     }
 
     _selectedLocation = selectedVehicle.vehicleLocation != null
-        ? LatLng(
-          selectedVehicle.vehicleLocation?.latitude ?? 0.0,
+        ? LatLng(selectedVehicle.vehicleLocation?.latitude ?? 0.0,
             selectedVehicle.vehicleLocation?.longitude ?? 0.0)
         : const LatLng(9.175249926873791, 76.5014099702239);
 
@@ -124,12 +124,52 @@ class _NavigationScreenState extends State<NavigationScreen> {
     super.dispose();
   }
 
-  void onTripEnd() {
+  Future<void> onTripEnd()async {
     print("Trip is ending.");
+
+    try {
+      await tripStatus(
+        loginController.currentTrip!.tripNumber,
+        'completed',
+      );
+
+      await updateVehicleStatus(
+        selectedVehicle.vehicleNumber,
+        'In Garage',
+      );
+
+      print("Statuses updated successfully.");
+    } catch (e) {
+      print("Error updating statuses: $e");
+      createToastBottom("Failed to update statuses. Please try again.");
+    }
+
+
+
+
     var locationService = LocationUpdateService(selectedVehicle.vehicleNumber);
 
     locationService.stopLocationUpdates();
   }
+
+  // Future<void> updateStatus() async {
+  //   try {
+  //     await tripStatus(
+  //       loginController.currentTrip!.tripNumber,
+  //       'completed',
+  //     );
+
+  //     await updateVehicleStatus(
+  //       selectedVehicle.vehicleNumber,
+  //       'In Garage',
+  //     );
+
+  //     print("Statuses updated successfully.");
+  //   } catch (e) {
+  //     print("Error updating statuses: $e");
+  //     createToastBottom("Failed to update statuses. Please try again.");
+  //   }
+  // }
 
   void onPauseTrip() {
     final LocationUpdateService _locationUpdateService =
@@ -1071,19 +1111,18 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ClipRRect(
-                                borderRadius: BorderRadius.circular(25),
-                                child: Image.network(
-                                  selectedVehicle.vehiclePhoto,
-                                  height: 130,
-                                  width: 130,
-                                ),
+                              borderRadius: BorderRadius.circular(25),
+                              child: Image.network(
+                                selectedVehicle.vehiclePhoto,
+                                height: 130,
+                                width: 130,
+                              ),
 
-
-                                // child: Image.memory(
-                                //     base64Decode(selectedVehicle.vehiclePhoto),
-                                //     height: 130,
-                                //     width: 130)
-                                    ),
+                              // child: Image.memory(
+                              //     base64Decode(selectedVehicle.vehiclePhoto),
+                              //     height: 130,
+                              //     width: 130)
+                            ),
                           ],
                         ),
                       ),
@@ -1152,7 +1191,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                 ),
                                 const SizedBox(width: 20),
                                 ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       // print("Dashboard");
                                       showDialog(
                                         context: context,
@@ -1160,6 +1199,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                           return buildStopAlert();
                                         },
                                       );
+
+                                      // await updateStatus();
+
                                       onTripEnd();
                                     },
                                     style: ButtonStyle(

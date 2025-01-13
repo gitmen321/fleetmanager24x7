@@ -83,30 +83,30 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
           margin: const EdgeInsets.all(30),
           child: Column(
             children: [
-             const SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               buildDashboardBox(),
               widget._isStored == true ? buildBodyConditionBox() : Container(),
-             const SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               Divider(
                 color: greenlight.withOpacity(.3),
                 thickness: 1,
               ),
-             const SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               buildCheckBox(),
-             const SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               Divider(
                 color: greenlight.withOpacity(.3),
                 thickness: 1,
               ),
-             const SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               const Padding(
@@ -163,7 +163,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     ),
                   ),
                 ),
-               const SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Obx(
@@ -171,7 +171,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                       ? Image.file(_scratchImageFile.value!)
                       : Container(),
                 ),
-               const SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 Center(
@@ -207,7 +207,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 _scratchImageFile.value != null
                     ? Column(
                         children: [
-                         const SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           ElevatedButton(
@@ -263,14 +263,14 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     : Container(),
               ],
 
-             const SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               Divider(
                 color: greenlight.withOpacity(.3),
                 thickness: 1,
               ),
-             const SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               // Row(
@@ -350,11 +350,10 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                       fit: BoxFit.cover,
                     ),
 
-
                     // child: Image.memory(
                     //   base64Decode(selectedVehicle.vehiclePhoto),
                     //   height: 140,
-                    //   width: 180, 
+                    //   width: 180,
                     //   // Added width to maintain aspect ratio
                     //   fit: BoxFit
                     //       .cover, // Ensures the image fits within the given space
@@ -366,41 +365,47 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      
                       children: [
                         GestureDetector(
-                          onTap: controller.checkboxValues
-                                      .every((value) => value) &&
-                                  controller.isDashboard
-                              ? () async {
-                                  bool pinValidity =
-                                      await controller.showSetPinOverLay();
-                                  if (pinValidity) {
-                                    await updateTripStatus(
-                                        loginController.user!.userName,
-                                        loginController
-                                            .currentTrip!.tripNumber);
-                                    await updateKeyCustody(
-                                        selectedVehicle.vehicleNumber,
-                                        loginController.user!.userName);
-                                    await updateTripStartTime(loginController
-                                        .currentTrip!.tripNumber);
-                                    loginController.currentTrip!
-                                        .tripStartTimeDriver = DateTime.now();
-                                    loginController.user!.status =
-                                        loginController.currentTrip!.tripNumber;
-                                    Get.offAll(() =>
-                                        NavigationScreen(selectedVehicle));
-                                  }
-                                }
-                              : () {
-                                  createToastBottom(
-                                      "Please check all the fields");
-                                },
+                          onTap: () async {
+                            bool pinValidity =
+                                await controller.showSetPinOverLay();
+                            if (pinValidity) {
+                              // Update trip status to 'live'
+                              await tripStatus(
+                                loginController.currentTrip!.tripNumber,
+                                'live',
+                              );
+
+                              // Update vehicle status to 'On Trip'
+                              await updateVehicleStatus(
+                                selectedVehicle.vehicleNumber,
+                                'On Trip',
+                              );
+
+                              await updateTripStatus(
+                                loginController.user!.userName,
+                                loginController.currentTrip!.tripNumber,
+                              );
+                              await updateKeyCustody(
+                                selectedVehicle.vehicleNumber,
+                                loginController.user!.userName,
+                              );
+                              await updateTripStartTime(
+                                loginController.currentTrip!.tripNumber,
+                              );
+                              loginController.currentTrip!.tripStartTimeDriver =
+                                  DateTime.now();
+                              loginController.user!.status =
+                                  loginController.currentTrip!.tripNumber;
+                              Get.offAll(
+                                  () => NavigationScreen(selectedVehicle));
+                            }
+                          },
                           child: Container(
                             decoration: BoxDecoration(
-                              color: controller.checkboxValues
-                                          .every((value) => value) &&
-                                      controller.isDashboard
+                              color: controller.isDashboard
                                   ? greenlight
                                   : greenlight.withOpacity(.4),
                               borderRadius: BorderRadius.circular(8),
@@ -419,6 +424,71 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                             ),
                           ),
                         ),
+
+                        // GestureDetector(
+                        //   onTap: controller.checkboxValues
+                        //               .every((value) => value) &&
+                        //           controller.isDashboard
+                        //       ? () async {
+                        //           bool pinValidity =
+                        //               await controller.showSetPinOverLay();
+                        //           if (pinValidity) {
+                        //             // Update trip status to 'live'
+                        //             await tripStatus(
+                        //               loginController.currentTrip!.tripNumber,
+                        //               'live',
+                        //             );
+
+                        //             // Update vehicle status to 'On Trip'
+                        //             await updateVehicleStatus(
+                        //               selectedVehicle.vehicleNumber,
+                        //               'On Trip',
+                        //             );
+
+                        //             await updateTripStatus(
+                        //                 loginController.user!.userName,
+                        //                 loginController
+                        //                     .currentTrip!.tripNumber);
+                        //             await updateKeyCustody(
+                        //                 selectedVehicle.vehicleNumber,
+                        //                 loginController.user!.userName);
+                        //             await updateTripStartTime(loginController
+                        //                 .currentTrip!.tripNumber);
+                        //             loginController.currentTrip!
+                        //                 .tripStartTimeDriver = DateTime.now();
+                        //             loginController.user!.status =
+                        //                 loginController.currentTrip!.tripNumber;
+                        //             Get.offAll(() =>
+                        //                 NavigationScreen(selectedVehicle));
+                        //           }
+                        //         }
+                        //       : () {
+                        //           createToastBottom(
+                        //               "Please check all the fields");
+                        //         },
+                        //   child: Container(
+                        //     decoration: BoxDecoration(
+                        //       color: controller.checkboxValues
+                        //                   .every((value) => value) &&
+                        //               controller.isDashboard
+                        //           ? greenlight
+                        //           : greenlight.withOpacity(.4),
+                        //       borderRadius: BorderRadius.circular(8),
+                        //     ),
+                        //     child: Padding(
+                        //       padding: const EdgeInsets.all(10.0),
+                        //       child: Text(
+                        //         "TAKE HANDOVER",
+                        //         style: GoogleFonts.lato(
+                        //           color: Colors.white,
+                        //           fontSize: 12,
+                        //           fontWeight: FontWeight.w700,
+                        //           height: 1.2,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () async {
