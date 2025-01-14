@@ -29,9 +29,11 @@ class HomeController extends GetxController {
   RxBool _obscureText1 = true.obs;
   RxBool _obscureText2 = true.obs;
   RxBool _obscureText = true.obs;
+  RxBool _obscureText3 = false.obs;
   RxBool isinitloading = false.obs;
   List<FlSpot> spots = [];
   int? totalTripsThisYear;
+  //bool obscureText3 = false;
 
   void refreshPage() {
     Get.off(MainScreen());
@@ -112,7 +114,7 @@ class HomeController extends GetxController {
     Get.back();
     Get.dialog(
       AlertDialog(
-        title: Text('CHANGE PIN',
+        title: const Text('CHANGE PIN',
             style: TextStyle(
                 color: primary, fontSize: 20, fontWeight: FontWeight.w600)),
         backgroundColor: secondary,
@@ -294,7 +296,7 @@ class HomeController extends GetxController {
     Get.back();
     Get.dialog(
       AlertDialog(
-        title: Text('Edit Profile',
+        title: const Text('Edit Profile',
             style: TextStyle(
                 color: primary, fontSize: 20, fontWeight: FontWeight.w600)),
         backgroundColor: secondary,
@@ -338,13 +340,13 @@ class HomeController extends GetxController {
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
                     ],
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       counterText: "",
-                      prefixIcon: const Icon(Icons.dialpad_outlined),
+                      prefixIcon: Icon(Icons.dialpad_outlined),
                       prefixIconColor: primary,
                       border: InputBorder.none,
                       labelText: 'Mobile Number',
-                      labelStyle: const TextStyle(
+                      labelStyle: TextStyle(
                           color: primary,
                           fontSize: 15,
                           fontWeight: FontWeight.w600),
@@ -358,13 +360,13 @@ class HomeController extends GetxController {
                 ),
                 child: TextFormField(
                   controller: locationController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     counterText: "",
-                    prefixIcon: const Icon(Icons.location_pin),
+                    prefixIcon: Icon(Icons.location_pin),
                     prefixIconColor: primary,
                     border: InputBorder.none,
                     labelText: 'Location',
-                    labelStyle: const TextStyle(
+                    labelStyle: TextStyle(
                         color: primary,
                         fontSize: 15,
                         fontWeight: FontWeight.w600),
@@ -436,4 +438,147 @@ class HomeController extends GetxController {
       ),
     );
   }
+
+  Future<void> deleteAccount() async {
+    TextEditingController passwordController = TextEditingController();
+
+    Get.dialog(
+      AlertDialog(
+        title: const Text(
+          'Delete Account',
+          style: TextStyle(
+              color: primary, fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: secondary,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Please enter your password to proceed.",
+                style: TextStyle(
+                    color: primary, fontSize: 15, fontWeight: FontWeight.w400),
+              ),
+              const SizedBox(height: 10),
+              Obx(() =>TextFormField(
+                controller: passwordController,
+                obscureText: _obscureText3.value,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(
+                      color: primary, fontSize: 15, fontWeight: FontWeight.w600),
+                  prefixIcon: const Icon(Icons.lock),
+                  prefixIconColor: primary,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText3.value
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: primary,
+                    ),
+                    onPressed: () {
+                       _obscureText3.toggle();
+                    },
+                ),
+              ),
+                ))
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              passwordController.clear();
+              Get.back();
+            },
+            child: const Text(
+              "CANCEL",
+              style: TextStyle(
+                  fontSize: 15, color: primary, fontWeight: FontWeight.w600),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (passwordController.text == loginController.user?.password) {
+                // Password matches, show confirmation dialog
+                Get.back(); // Close the password dialog
+                Get.dialog(
+                  AlertDialog(
+                    title: const Text(
+                      'Confirm Deletion',
+                      style: TextStyle(
+                          color: primary, fontSize: 20, fontWeight: FontWeight.w600),
+                    ),
+                    backgroundColor: secondary,
+                    content: const Text(
+                      "Are you sure you want to delete your account permanently?",
+                      style: TextStyle(
+                          color: primary, fontSize: 15, fontWeight: FontWeight.w400),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Get.back();
+                        },
+                        child: const Text(
+                          "CANCEL",
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: primary,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          // Delete the account from the database
+                          try {
+                            await collection_drivers?.remove(
+                              where.eq('_id', ObjectId.parse(loginController.user!.id)),
+                            );
+                            createToastTop("Account deleted successfully");
+                          } catch (e) {
+                            print("Error deleting account: $e");
+                          }
+
+                          // Log the user out and navigate to login screen
+                          await logout();
+                        },
+                        child: const Text(
+                          "CONFIRM",
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: primary,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // Password incorrect, show snackbar
+                Get.back();
+                Get.snackbar(
+                  "Error",
+                  "Password incorrect",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                  snackPosition: SnackPosition.BOTTOM,
+                );
+              }
+            },
+            child: const Text(
+              "PROCEED",
+              style: TextStyle(
+                  fontSize: 15, color: primary, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 }

@@ -86,6 +86,85 @@ class LoginController extends GetxController {
   }
 
   Future<void> fetchTripsAndVehicles() async {
+    // Fetch trips for the user, excluding trips with "completed" status
+    var globalTrips = await collection_trips
+        ?.find(where.oneFrom(
+        '_id', user!.trips.map((id) => ObjectId.parse(id)).toList())
+        .ne('tripStatus', 'completed')) // Exclude completed trips
+        .toList();
+
+    if (globalTrips != null && globalTrips.isNotEmpty) {
+      for (var trip in globalTrips) {
+        print('fetching trips started......${trip['tripNumber']}');
+        print(trip["tripEndDate"]);
+        trips.add(Trip(
+          trip['tripNumber'],
+          trip['vehicleNumber'],
+          trip['driverId'],
+          trip['tripDate'],
+          trip['tripEndDate'],
+          trip['tripStartTimeDriver'],
+          trip['tripEndTimeDriver'],
+          trip['tripStartLocation'],
+          trip['tripDestination'],
+          trip['vehicleLocation'],
+          trip['tripType'],
+          trip['tripRemunaration'],
+          trip['notification'],
+          trip['odometerStart'],
+          trip['odometerEnd'],
+          trip['fuelStart'],
+          trip['fuelEnd'],
+          trip['odometerStartImage'],
+          trip['odometerEndImage'],
+        ));
+
+        // Fetch and add vehicle data if it's not already present
+        if (!vehicles.any((car) => car.vehicleNumber == trip["vehicleNumber"])) {
+          var vehicle = await collection_vehicles
+              ?.findOne(where.eq('vehicleNumber', trip['vehicleNumber']));
+          if (vehicle != null) {
+            print(
+                "fetching vehicle started.............. ${vehicle['vehicleName']}");
+            List<String> vehiclePhoto =
+            List<String>.from(vehicle['vehiclePhotos'] ?? []);
+            vehicles.add(Vehicle(
+              vehicle['vehicleName'],
+              vehicle['vehicleNumber'],
+              vehicle['insuranceDueDate'],
+              vehicle['istimaraDueDate'],
+              vehicle['vehicleType'],
+              vehicle['vehiclePhoto'],
+              vehicle['ownVehicle'],
+              vehicle['insurancePhoto'],
+              vehicle['lastTyreChangeOdoReading'],
+              vehicle['odometerReading'],
+              vehicle['istimaraPhoto'],
+              vehiclePhoto,
+              vehicle['vehicleStatus'],
+              vehicle['vehicleLocation'] != null
+                  ? VehicleLocation.fromMap(vehicle['vehicleLocation'])
+                  : null,
+              vehicle['notesAboutVehicle'],
+              vehicle['rentalAgreement'],
+              vehicle['lastServiceDate'],
+              vehicle['tireChangeDate'],
+              vehicle['keyCustody'],
+            ));
+            print("vehicle ${vehicle['vehicleName']} added.............. ");
+          }
+        } else {
+          print('Vehicle already added');
+        }
+      }
+    }
+    trips.sort((a, b) => a.tripDate.compareTo(b.tripDate));
+    getChartData();
+    assignTrip();
+  }
+
+/*
+  Future<void> fetchTripsAndVehicles() async {
     // var globalTrips = await collection_trips
     //     ?.find(where.eq('driverUsername', user?.userName))
     //     .toList();
@@ -168,6 +247,7 @@ class LoginController extends GetxController {
     getChartData();
     assignTrip();
   }
+*/
 
   getChartData() async {
     var globalchartData = await collection_charts

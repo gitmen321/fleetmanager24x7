@@ -169,6 +169,24 @@ class NavDrawer extends StatelessWidget {
                               
                                 ],
                               ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    side: const BorderSide(color: Colors.white54),
+                                    minimumSize: const Size(double.maxFinite, 35),
+                                  ),
+                                  onPressed: () {
+                                    homeController.deleteAccount();
+                                  },
+                                  child: const Text(
+                                    'DELETE ACCOUNT',
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold),
+                                  )),
                             ],
                           ),
                         ],
